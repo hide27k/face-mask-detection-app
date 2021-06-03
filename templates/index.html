@@ -1,0 +1,27 @@
+<html>
+  <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="{{ category }}" style="color: red;">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <h2>Upload a photo</h2>
+    <form action = "./" method = "POST" 
+      enctype = "multipart/form-data">
+      <input type = "file" name = "file" />
+      <input type = "submit"/>
+    </form>
+    {% if result %}
+      <br>
+      <hr>
+      <img src="{{filepath}} " border="1">
+      <br>
+      <p>There are {{result}} people in the photo.</p>
+      <p>There are {{mask}} people wearing a face mask.</p>
+      <p>There are {{nonmask}} people not wearing a face mask.</p>
+      <p>There are {{nondist}} people who doesn't wear a face mask and have enough distance.</p>
+    {% endif %}
+  </body>
+</html>
