@@ -5,7 +5,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.1
 scipy==1.6.3
 numpy==1.20.2
-opencv_python==4.5.2.52
+opencv-python--headless==4.5.1.48
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==1.8.1+cpu
 Flask==2.0.1
