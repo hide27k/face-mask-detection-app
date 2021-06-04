@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Face Mask Detection App
 
 # How to run it in the local environment
@@ -15,3 +16,6 @@ $ python3 detection.py
 ```
 
 The web app starts running on `http://127.0.0.1:5000/`.
+=======
+# face-mask-detection-app
+>>>>>>> 5ea2bdafee44f10d9bdfe554a8f2eea00c069372
