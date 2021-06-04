@@ -115,16 +115,16 @@ def upload_file():
         # Error handling
         if "file" not in request.files:
             flash("Submitted an empty file")
-            return redirect(request.url)
+            return render_template("index.html")
 
         f = request.files["file"]
         if f.filename == '':
             flash("Submitted an empty file")
-            return redirect(request.url)
+            return render_template("index.html")
         
         if not allowed_file(f.filename):
             flash("File type must be png, jpg, or jpeg")
-            return redirect(request.url)
+            return render_template("index.html")
 
         # Init a folder
         for p in glob.glob("./static/*.png"):
@@ -144,6 +144,12 @@ def upload_file():
         numMask = 0
         numNonMask = 0
         numNonDist = 0
+
+        print(faces is None)
+
+        if faces is None:
+            flash("No faces were detected")
+            return render_template("index.html")
 
         if len(faces) >= 1:
             label = [0 for i in range(len(faces))]
@@ -193,8 +199,8 @@ def upload_file():
             processedImg = Image.fromarray(new_img)
             processedImg.save(filename + "_processed.png")
         else:
-          flash("No faces were detected")
-          return redirect(request.url)
+          flash("No face has been detected")
+          return render_template("index.html")
 
         # Clean-up
         os.remove(filepath)
