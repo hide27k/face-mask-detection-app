@@ -25,19 +25,25 @@
       <input type = "file" name = "file" />
       <input type = "submit"/>
     </form>
-    {% if result %}
+    {% if filepath %}
       <br>
       <div class="img">
-        <img src="{{filepath}}" border="1">
+        <p class="instruction"> Click Image to Download </p>
+        <a href="{{filepath}}" download="result">
+          <img src="{{filepath}}" border="1">
+        </a>
       </div>
       <br>
+    {% endif %}
+    {% if result %}
       <h3 class="summary">Summary</h3>
       <div class="description">
         <ul>
           <li>There are {{result}} people in the photo.</li>
-          <li>There are {{mask}} people wearing a face mask.</li>
-          <li>There are {{nonmask}} people not wearing a face mask.</li>
-          <li>There are {{nondist}} people who don't wear a face mask and don't have enough distance.</li>
+          <li>There are {{mask}} people wearing a face mask correctly.</li>
+          <li>There are {{nonmask}} people not wearing a face mask correctly.</li>
+          <li>There are {{nonmasknose}} people wearing a face mask below their nose.</li>
+          <li>There are {{nondist}} people who don't wear a face mask and they don't have enough social distance.</li>
         </ul>
       </div>
     {% endif %}

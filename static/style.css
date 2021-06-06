@@ -45,6 +45,10 @@ a {
   text-align: center;
 }
 
+img {
+  width: 800px;
+}
+
 .summary {
   text-align: center;
 }

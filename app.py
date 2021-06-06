@@ -144,12 +144,11 @@ def upload_file():
         numMask = 0
         numNonMask = 0
         numNonDist = 0
-
-        print(faces is None)
+        numNonMaskNose = 0
 
         if faces is None:
             flash("No faces were detected")
-            return render_template("index.html")
+            return render_template("index.html", filepath=filepath)
 
         if len(faces) >= 1:
             label = [0 for i in range(len(faces))]
@@ -174,37 +173,41 @@ def upload_file():
                 pred = model(crop)
                 mask_result = 1
                 if pred > 0.8:
-                  mask_result = 0
+                    mask_result = 0
 
-                  # Check if nose is covered correctly
-                  noses = nose_detect_model.detectMultiScale(new_img[int(y) : int(h), int(x) : int(w)], scaleFactor=1.1, minNeighbors=4)
-                  if len(noses) >= 1:
-                    mask_result = 2
+                    # Check if nose is covered correctly
+                    noses = nose_detect_model.detectMultiScale(new_img[int(y) : int(h), int(x) : int(w)], scaleFactor=1.1, minNeighbors=4)
+                    if len(noses) >= 1:
+                        mask_result = 2
                 
                 cv2.putText(new_img, MASK_LABEL[mask_result], (int(x), int(y) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, MASK_ON_LABEL[mask_result], 2)
                 d = label[i]
                 if mask_result == 0:
-                  d = 0
+                    d = 0
                 cv2.rectangle(new_img, (int(x), int(y)), (int(w), int(h)), MASK_ON_LABEL[mask_result], 1)
                 cv2.putText(new_img, DIST_LABEL[d], (int(x), int(h) + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, MASK_ON_LABEL[mask_result], 2)
 
                 if mask_result == 0:
-                  numMask += 1
+                    numMask += 1
                 else:
-                  numNonMask += 1
+                    numNonMask += 1
+
+                if mask_result == 2:
+                    numNonMaskNose += 1
 
                 if d == 1:
-                  numNonDist += 1
+                    numNonDist += 1
 
             processedImg = Image.fromarray(new_img)
             processedImg.save(filename + "_processed.png")
         else:
-          flash("No face has been detected")
-          return render_template("index.html")
+            flash("No face has been detected")
+            return render_template("index.html", filepath=filepath)
 
         # Clean-up
-        os.remove(filepath)
-        return render_template("index.html", filepath=filename + "_processed.png", result=len(faces), mask=numMask, nonmask=numNonMask, nondist=numNonDist)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        return render_template("index.html", filepath=filename + "_processed.png", result=len(faces), mask=numMask, nonmask=numNonMask, nondist=numNonDist, nonmasknose=numNonMaskNose)
 
 if __name__ == "__main__":
     app.run()
