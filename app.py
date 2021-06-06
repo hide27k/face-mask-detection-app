@@ -188,7 +188,7 @@ def upload_file():
                 cv2.rectangle(new_img, (int(x), int(y)), (int(w), int(h)), MASK_ON_LABEL[mask_result], 1)
                 cv2.putText(new_img, DIST_LABEL[d], (int(x), int(h) + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, MASK_ON_LABEL[mask_result], 2)
 
-                if mask_result == 1:
+                if mask_result == 0:
                   numMask += 1
                 else:
                   numNonMask += 1

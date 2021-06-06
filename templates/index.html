@@ -1,5 +1,18 @@
-<html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Face Mask Detector</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" >
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+  </head>
   <body>
+    <header>
+      <a class="item" href="https://hide27k.github.io/face-mask-detection" target="_blank">About</a>
+      <a class="item" href="https://github.com/hide27k/face-mask-detection/issues" target="_blank">Report a bug</a>
+    </header>
+    <div class="decoration"></div>
+    <h1 class="title"> Face Mask Detector</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -7,21 +20,26 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-    <h2>Upload a photo</h2>
-    <form action = "./" method = "POST" 
-      enctype = "multipart/form-data">
+    <p class="instruction"> Upload Image </p>
+    <form class="form" action = "./" method = "POST" enctype = "multipart/form-data">
       <input type = "file" name = "file" />
       <input type = "submit"/>
     </form>
     {% if result %}
       <br>
-      <hr>
-      <img src="{{filepath}} " border="1">
+      <div class="img">
+        <img src="{{filepath}}" border="1">
+      </div>
       <br>
-      <p>There are {{result}} people in the photo.</p>
-      <p>There are {{mask}} people wearing a face mask.</p>
-      <p>There are {{nonmask}} people not wearing a face mask.</p>
-      <p>There are {{nondist}} people who doesn't wear a face mask and have enough distance.</p>
+      <h3 class="summary">Summary</h3>
+      <div class="description">
+        <ul>
+          <li>There are {{result}} people in the photo.</li>
+          <li>There are {{mask}} people wearing a face mask.</li>
+          <li>There are {{nonmask}} people not wearing a face mask.</li>
+          <li>There are {{nondist}} people who don't wear a face mask and don't have enough distance.</li>
+        </ul>
+      </div>
     {% endif %}
   </body>
 </html>
