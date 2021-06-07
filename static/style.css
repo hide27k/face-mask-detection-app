@@ -61,3 +61,15 @@ ul {
 	display: inline-block; 
 	text-align: left; 
 }
+
+.vgg {
+  text-align: center;
+}
+
+.resnet {
+  text-align: center;
+}
+
+.models {
+  text-align: center;
+}

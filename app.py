@@ -78,11 +78,17 @@ def VGG19():
 # Load a model from .pth file.
 device = torch.device("cpu")
 model = ResNet34().to(device)
-# Switch the file path depending on what model you will use.
 model.load_state_dict(
     torch.load("./model/resnet34_model_v0.pth", map_location=lambda storage, loc: storage)
 )
 model.eval()
+
+model1 = VGG19().to(device)
+# Switch the file path depending on what model you will use.
+model1.load_state_dict(
+    torch.load("./model/vgg19_model_v0.pth", map_location=lambda storage, loc: storage)
+)
+model1.eval()
 
 # Face Detection Models
 mtcnn = MTCNN(margin=20, keep_all=True, post_process=False, device=device)
@@ -121,24 +127,29 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route("/", methods=["GET", "POST"])
-def upload_file():
+@app.route("/", methods=["GET"])
+def main_page():
     if request.method == "GET":
         return render_template("index.html")
+
+@app.route("/vgg", methods=["GET", "POST"])
+def upload_file_vgg():
+    if request.method == "GET":
+        return render_template("vgg.html")
     if request.method == "POST":
         # Error handling
         if "file" not in request.files:
             flash("Submitted an empty file")
-            return render_template("index.html")
+            return render_template("vgg.html")
 
         f = request.files["file"]
         if f.filename == '':
             flash("Submitted an empty file")
-            return render_template("index.html")
+            return render_template("vgg.html")
         
         if not allowed_file(f.filename):
             flash("File type must be png, jpg, or jpeg")
-            return render_template("index.html")
+            return render_template("vgg.html")
 
         # Init a folder
         for p in glob.glob("./static/*.png"):
@@ -146,7 +157,7 @@ def upload_file():
                 os.remove(p)
 
         # Save an uploaded image
-        filename = "./static/" + datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = "./static/" + datetime.now().strftime("%Y%m%d%H%M%S") + "_vgg19"
         filepath = filename + ".png"
         f.save(filepath)
 
@@ -162,7 +173,109 @@ def upload_file():
 
         if faces is None:
             flash("No faces were detected")
-            return render_template("index.html", filepath=filepath)
+            return render_template("vgg.html", filepath=filepath)
+
+        if len(faces) >= 1:
+            label = [0 for i in range(len(faces))]
+            for i in range(len(faces) - 1):
+                for j in range(i + 1, len(faces)):
+                    dist = distance.euclidean(faces[i][:2],faces[j][:2])
+                    if dist < MIN_DISTANCE:
+                        label[i] = 1
+                        label[j] = 1
+
+            new_img = cv2.cvtColor(input_img, cv2.COLOR_RGB2BGR)
+            for i in range(len(faces)):
+                (x, y, w, h) = faces[i]
+                crop = new_img[int(y) : int(h), int(x) : int(w)]
+                crop = cv2.resize(crop,(224, 224))
+                crop = torch.tensor(crop/255)
+                crop = crop.permute(2, 0, 1)
+                normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                crop = normalize(crop)
+                crop = crop.float().to(device)
+                crop = crop.unsqueeze(0)
+                pred = model1(crop)
+                mask_result = 1
+                if pred > 0.8:
+                    mask_result = 0
+
+                    # Check if nose is covered correctly
+                    noses = nose_detect_model.detectMultiScale(new_img[int(y) : int(h), int(x) : int(w)], scaleFactor=1.1, minNeighbors=4)
+                    if len(noses) >= 1:
+                        mask_result = 2
+                
+                cv2.putText(new_img, MASK_LABEL[mask_result], (int(x), int(y) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, MASK_ON_LABEL[mask_result], 2)
+                d = label[i]
+                if mask_result == 0:
+                    d = 0
+                cv2.rectangle(new_img, (int(x), int(y)), (int(w), int(h)), MASK_ON_LABEL[mask_result], 1)
+                cv2.putText(new_img, DIST_LABEL[d], (int(x), int(h) + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, MASK_ON_LABEL[mask_result], 2)
+
+                if mask_result == 0:
+                    numMask += 1
+                else:
+                    numNonMask += 1
+
+                if mask_result == 2:
+                    numNonMaskNose += 1
+
+                if d == 1:
+                    numNonDist += 1
+
+            processedImg = Image.fromarray(new_img)
+            processedImg.save(filename + "_processed.png")
+        else:
+            flash("No face has been detected")
+            return render_template("vgg.html", filepath=filepath)
+
+        # Clean-up
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        return render_template("vgg.html", filepath=filename + "_processed.png", result=len(faces), mask=numMask, nonmask=numNonMask, nondist=numNonDist, nonmasknose=numNonMaskNose)
+
+@app.route("/resnet", methods=["GET", "POST"])
+def upload_file_resnet():
+    if request.method == "GET":
+        return render_template("resnet.html")
+    if request.method == "POST":
+        # Error handling
+        if "file" not in request.files:
+            flash("Submitted an empty file")
+            return render_template("resnet.html")
+
+        f = request.files["file"]
+        if f.filename == '':
+            flash("Submitted an empty file")
+            return render_template("resnet.html")
+        
+        if not allowed_file(f.filename):
+            flash("File type must be png, jpg, or jpeg")
+            return render_template("resnet..html")
+
+        # Init a folder
+        for p in glob.glob("./static/*.png"):
+            if os.path.isfile(p):
+                os.remove(p)
+
+        # Save an uploaded image
+        filename = "./static/" + datetime.now().strftime("%Y%m%d%H%M%S") + "_resnet34"
+        filepath = filename + ".png"
+        f.save(filepath)
+
+        # Read the image
+        input_img = cv2.imread(filepath)
+        converted_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
+        faces, conf = mtcnn.detect(cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB))
+
+        numMask = 0
+        numNonMask = 0
+        numNonDist = 0
+        numNonMaskNose = 0
+
+        if faces is None:
+            flash("No faces were detected")
+            return render_template("resnet.html", filepath=filepath)
 
         if len(faces) >= 1:
             label = [0 for i in range(len(faces))]
@@ -216,12 +329,12 @@ def upload_file():
             processedImg.save(filename + "_processed.png")
         else:
             flash("No face has been detected")
-            return render_template("index.html", filepath=filepath)
+            return render_template("resnet.html", filepath=filepath)
 
         # Clean-up
         if os.path.exists(filepath):
             os.remove(filepath)
-        return render_template("index.html", filepath=filename + "_processed.png", result=len(faces), mask=numMask, nonmask=numNonMask, nondist=numNonDist, nonmasknose=numNonMaskNose)
+        return render_template("resnet.html", filepath=filename + "_processed.png", result=len(faces), mask=numMask, nonmask=numNonMask, nondist=numNonDist, nonmasknose=numNonMaskNose)
 
 if __name__ == "__main__":
     app.run()
