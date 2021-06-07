@@ -62,9 +62,23 @@ def ResNet18():
 
     return model
 
+def VGG19():
+    model = models.vgg19(pretrained=True)
+
+    for param in model.parameters():
+        param.requires_grad = False
+
+    num_ftrs = model.classifier[6].in_features
+    model.classifier[5] = nn.Linear(num_ftrs, 1)
+    model.classifier[6] = nn.Sigmoid()
+
+
+    return model
+
 # Load a model from .pth file.
 device = torch.device("cpu")
 model = ResNet34().to(device)
+# Switch the file path depending on what model you will use.
 model.load_state_dict(
     torch.load("./model/resnet34_model_v0.pth", map_location=lambda storage, loc: storage)
 )
