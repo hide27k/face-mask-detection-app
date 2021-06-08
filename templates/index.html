@@ -11,24 +11,28 @@
   </head>
   <body>
     <header>
-      <br><br><br><br>
-      <img src="{{ url_for('static', filename='img/logo.png') }}" width="25%" class="center"/>
-      <br><br>
       <div class="option">
         <a class="item" href="https://hide27k.github.io/face-mask-detection" target="_blank">About</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
         <a class="item" href="https://github.com/hide27k/face-mask-detection/issues" target="_blank">Report a bug</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
       </div>
+      <br><br><br><br>
+      <img src="{{ url_for('static', filename='img/logo.png') }}" width="25%" class="center"/>
+      <br>
     </header>
     <div class="decoration"></div>
     <p class="instruction"><p><b>Choose a model to run in the backend</b></p>
-    <br><br>
+    <br>
     <div class="models">
-      <button class="button vgg">
-        <a href="{{ url_for('upload_file_vgg') }}" >VGG19</a>
-      </button>
-      <button class="button resnet">
-        <a href="{{ url_for('upload_file_resnet') }}" >ResNet34</a>
-      </button>
+      <a href="{{ url_for('upload_file_vgg') }}" >
+        <button class="button vgg">
+          <h4>VGG19</h4>
+        </button>
+      </a>
+      <a href="{{ url_for('upload_file_resnet') }}" >
+        <button class="button resnet">
+          <h4>ResNet34</h4>
+        </button>
+      </a>
     </div>
   </body>
 </html>
