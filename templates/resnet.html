@@ -3,17 +3,24 @@
   <head>
     <meta charset="utf-8">
     <title>Face Mask Detector</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" >
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" >
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
   </head>
   <body>
     <header>
-      <a class="item" href="{{ url_for('main_page') }}" >Home</a>
-      <a class="item" href="https://hide27k.github.io/face-mask-detection" target="_blank">About</a>
-      <a class="item" href="https://github.com/hide27k/face-mask-detection/issues" target="_blank">Report a bug</a>
+      <br><br><br><br>
+      <img src="{{ url_for('static', filename='img/logo.png') }}" width="25%" class="center"/>
+      <br><br>
+      <div class="option">
+        <a class="item" href="{{ url_for('main_page') }}" >Home</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        <a class="item" href="https://hide27k.github.io/face-mask-detection" target="_blank">About</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        <a class="item" href="https://github.com/hide27k/face-mask-detection/issues" target="_blank">Report a bug</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      </div>
     </header>
     <div class="decoration"></div>
-    <h1 class="title"> Face Mask Detector (ResNet34)</h1>
+    <h1 class="title">ResNet34</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -31,7 +38,7 @@
       <div class="img">
         <p class="instruction"> Click Image to Download </p>
         <a href="{{filepath}}" download="result">
-          <img src="{{filepath}}" border="1">
+          <img class="output" src="{{filepath}}" border="1">
         </a>
       </div>
       <br>
